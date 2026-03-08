@@ -305,7 +305,7 @@ Responda exatamente neste formato:
 5️⃣ Score estimado de otimização ATS (0–100)
 
 IMPORTANTE:
-No item 4️⃣, coloque o currículo otimizado completo exatamente entre estes marcadores:
+No item 4️⃣, insira o currículo otimizado completo entre os marcadores abaixo, sem comentar sobre eles, sem explicá-los e sem citá-los fora do próprio bloco de conteúdo:
 ===CURRICULO_OTIMIZADO_INICIO===
 (conteúdo do currículo otimizado)
 ===CURRICULO_OTIMIZADO_FIM===
