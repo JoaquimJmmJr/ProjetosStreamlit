@@ -1,13 +1,17 @@
 import os
 import streamlit as st
-import fitz  # PyMuPDF
 from dotenv import load_dotenv
-
-from llama_index.llms.groq import Groq
-from llama_index.llms.gemini import Gemini
 
 load_dotenv()
 
+def get_secret(key):
+    if key in st.secrets:
+        return st.secrets[key]
+    return os.getenv(key)
+
+import fitz  # PyMuPDF
+from llama_index.llms.groq import Groq
+from llama_index.llms.gemini import Gemini
 
 # ============================ Helpers ================================ #
 
@@ -21,20 +25,20 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes, max_chars: int = 200_000) -> s
     return text[:max_chars] if text else ""
 
 def get_llm(model_choice: str):
-    """Cria o LLM (LlamaIndex puro)."""
     if model_choice == "Gemini (Google)":
-        api_key = os.getenv("GOOGLE_API_KEY")
+        api_key = get_secret("GOOGLE_API_KEY")
         if not api_key:
-            st.error("GOOGLE_API_KEY não encontrado no .env")
+            st.error("GOOGLE_API_KEY não encontrado em st.secrets nem no .env")
             st.stop()
-        # O Gemini no LlamaIndex usa a variável de ambiente, mas manter check é bom.
+        os.environ["GOOGLE_API_KEY"] = api_key
         return Gemini(model="models/gemini-2.5-flash")
 
     if model_choice == "Groq (Llama 4 Maverick)":
-        api_key = os.getenv("GROQ_API_KEY")
+        api_key = get_secret("GROQ_API_KEY")
         if not api_key:
-            st.error("GROQ_API_KEY não encontrado no .env")
+            st.error("GROQ_API_KEY não encontrado em st.secrets nem no .env")
             st.stop()
+        os.environ["GROQ_API_KEY"] = api_key
         return Groq(
             model="meta-llama/llama-4-maverick-17b-128e-instruct",
             temperature=0.1,
@@ -245,4 +249,5 @@ if cv_file:
         st.markdown(output)
 
 else:
+
     st.info("Envie o currículo em PDF na barra lateral para começar.")
