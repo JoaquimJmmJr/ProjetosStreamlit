@@ -307,8 +307,11 @@ def compute_hybrid_ats_score(cv_text: str, job_text: str, keywords_section_text:
 def build_ats_justification(score_data: dict) -> str:
     lines = [
         f"**Score por palavras-chave:** {score_data['keyword_score']}/100",
+        "",
         f"**Similaridade semântica global:** {score_data['semantic_score']}/100",
+        "",
         f"**Alinhamento entre requisitos e experiências:** {score_data['alignment_score']}/100",
+        "",
         f"**Presença de seções ATS-friendly:** {score_data['sections_score']}/100",
         "",
         "**Seções identificadas no currículo:**"
@@ -396,12 +399,12 @@ Sua tarefa é realizar uma análise técnica e estratégica seguindo as etapas a
 ETAPA 1 — Extração de Palavras-Chave (da VAGA)
 Identifique palavras-chave técnicas, comportamentais e específicas do setor presentes na descrição da vaga.
 Liste e apresente a seção obrigatoriamente em formato de lista com bullets, uma categoria por linha, exatamente neste estilo:
-**Hard skills**: ...
-**Soft skills**: ...
-**Ferramentas**: ...
-**Tecnologias**: ...
-**Certificações**: ...
-**Termos estratégicos repetidos**: ...
+::marker **Hard skills**: ... \n
+::marker **Soft skills**: ... \n
+::marker **Ferramentas**: ... \n
+::marker **Tecnologias**: ... \n
+::marker **Certificações**: ... \n
+::marker **Termos estratégicos repetidos**: ...
 Não escreva essa seção em parágrafo corrido.
 
 ETAPA 2 — Análise de Compatibilidade (CV x VAGA)
@@ -433,7 +436,7 @@ Responda exatamente neste formato:
 1️⃣ Palavras-chave identificadas
 2️⃣ Análise de compatibilidade
 3️⃣ Sugestões estratégicas de melhoria
-4️⃣ Versão otimizada completa do currículo (entregue sem comentários, apenas o texto otimizado)
+4️⃣ Versão otimizada completa do currículo (entregue apenas o texto otimizado, sem comentários)
 5️⃣ Justificativa final de aderência à vaga (não forneça nota numérica. Explique de forma objetiva os principais pontos fortes do currículo em relação à vaga e os principais gaps restantes)
 
 Seja técnico, estratégico e objetivo.
@@ -580,11 +583,12 @@ if cv_file:
         if not is_grammar:
             sections = split_optimizer_sections(output)
 
-            tab1, tab2, tab3, tab4 = st.tabs([
+            tab1, tab2, tab3, tab4, tab5 = st.tabs([
                 "1️⃣ Palavras-chave identificadas",
                 "2️⃣ Análise de compatibilidade",
                 "3️⃣ Sugestões estratégicas",
-                "4️⃣ Versão otimizada + Score ATS"
+                "4️⃣ Score ATS + Justificativa",
+                "5️⃣ Versão otimizada" 
             ])
 
             with tab1:
@@ -594,16 +598,12 @@ if cv_file:
             with tab3:
                 st.markdown(sections["suggestions"])
             with tab4:
-                st.markdown("### Currículo otimizado")
-                st.markdown(sections["optimized"])
-
                 hybrid_score = compute_hybrid_ats_score(
                     cv_text=cv_content,
                     job_text=job_text,
                     keywords_section_text=sections["keywords"]
                 )
 
-                st.divider()
                 st.metric("ATS Score", f"{hybrid_score['final_score']}/100")
                 st.progress(hybrid_score["final_score"] / 100)
 
@@ -613,9 +613,14 @@ if cv_file:
                 if sections["justification"]:
                     st.markdown("### Justificativa adicional do modelo")
                     st.markdown(sections["justification"])
+                    
+            with tab5:
+                 st.markdown("### Versão otimizada do currículo")
+                 st.markdown(sections["optimized"])
 
         else:
             st.markdown(output)
+
 
 else:
     st.info("Envie o currículo em PDF na barra lateral para começar.")
